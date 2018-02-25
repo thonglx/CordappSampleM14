@@ -48,17 +48,17 @@ app.controller('DemoAppController', function($http, $location, $uibModal) {
         modalInstance.result.then(() => {}, () => {});
     };
 
-    demoApp.bls = [];
-    demoApp.getBLs = () => $http.get(apiBaseURL + "bls")
+    demoApp.orders = [];
+    demoApp.getOrders = () => $http.get(apiBaseURL + "orders")
         .then(function(result) {
-                  demoApp.bls = result.data;
+                  demoApp.orders = result.data;
               });
 
-    demoApp.getBLs();
+    demoApp.getOrders();
 
-    // Transfer BL.
+    // Transfer Order.
     demoApp.transfer = () => {
-         const transferBLEndpoint =
+         const transferOrderEndpoint =
              apiBaseURL +
              "transfer-bl";
 
@@ -68,7 +68,7 @@ app.controller('DemoAppController', function($http, $location, $uibModal) {
         //            };
 
         // Create PO and handle success / fail responses.
-        $http.put(transferBLEndpoint, angular.toJson(demoApp.selectedBL.ref)).then(
+        $http.put(transferOrderEndpoint, angular.toJson(demoApp.selectedOrder.ref)).then(
               (result) => demoApp.displayMessage(result),
               (result) => demoApp.displayMessage(result)
         );
@@ -94,7 +94,7 @@ app.controller('ModalInstanceCtrl', function ($http, $location, $uibModalInstanc
     modalInstance.peers = peers;
     modalInstance.form = {};
     modalInstance.formError = false;
-    modalInstance.selectedBL = null;
+    modalInstance.selectedOrder = null;
 
     // Validate and create BL.
     modalInstance.create = () => {
@@ -103,22 +103,22 @@ app.controller('ModalInstanceCtrl', function ($http, $location, $uibModalInstanc
         } else {
             modalInstance.formError = false;
 
-            const bl = {
+            const order = {
                 referenceNumber: modalInstance.form.referenceNumber,
-                packingList: modalInstance.form.packingList,
+                totalAmount: modalInstance.form.totalAmount,
             };
 
             $uibModalInstance.close();
 
-            const createBLEndpoint =
+            const createOrderEndpoint =
                 apiBaseURL +
-                modalInstance.form.shippingCompany +
+                modalInstance.form.seller +
                 "/" +
-                modalInstance.form.importerBank +
-                "/issue-bl";
+                modalInstance.form.buyer +
+                "/create-order";
 
             // Create PO and handle success / fail responses.
-            $http.put(createBLEndpoint, angular.toJson(bl)).then(
+            $http.put(createOrderEndpoint, angular.toJson(bl)).then(
                 (result) => modalInstance.displayMessage(result),
                 (result) => modalInstance.displayMessage(result)
             );
@@ -137,12 +137,12 @@ app.controller('ModalInstanceCtrl', function ($http, $location, $uibModalInstanc
         modalInstanceTwo.result.then(() => {}, () => {});
     };
 
-    // Close create BL modal dialogue.
+    // Close create Order modal dialogue.
     modalInstance.cancel = () => $uibModalInstance.dismiss();
 
-    // Validate the BL.
+    // Validate the Order.
     function invalidFormInput() {
-        return (modalInstance.form.referenceNumber === undefined) || (modalInstance.form.shippingCompany === undefined) || (modalInstance.form.importerBank === undefined);
+        return (modalInstance.form.referenceNumber === undefined) || (modalInstance.form.seller === undefined) || (modalInstance.form.buyer === undefined);
     }
 });
 
